@@ -1,3 +1,3 @@
 # FileHub
 
-A fault tolerant, load balanced file streaming service.
+A fault tolerant, load balanced file sharing service.
