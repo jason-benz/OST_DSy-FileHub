@@ -1,8 +1,22 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileHub.Service", "FileHub.Service\FileHub.Service.csproj", "{F744B576-A7BF-43FD-BA4F-2826E5625649}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileHub.Frontend", "FileHub.Frontend\FileHub.Frontend.csproj", "{A7950095-C65A-4866-895E-93C6DCAC60F1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F744B576-A7BF-43FD-BA4F-2826E5625649}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F744B576-A7BF-43FD-BA4F-2826E5625649}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F744B576-A7BF-43FD-BA4F-2826E5625649}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F744B576-A7BF-43FD-BA4F-2826E5625649}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7950095-C65A-4866-895E-93C6DCAC60F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7950095-C65A-4866-895E-93C6DCAC60F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7950095-C65A-4866-895E-93C6DCAC60F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7950095-C65A-4866-895E-93C6DCAC60F1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
