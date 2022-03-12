@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Specialized;
 using System.Linq.Expressions;
 using System.Net;
 using System.Net.WebSockets;
@@ -40,9 +41,8 @@ namespace FileHub.Service.Network
             try
             {
                 webSocket = await UpgradeConnectionToWebSocket(listenerContext);
-                WebsocketHandler handler = new WebsocketHandler(webSocket);
-                //todo handle real files
-                await (handler.Read(new BinaryArchitect("xy")));
+                await RouteHttpRequest(listenerContext.Request, webSocket);
+                
                 Interlocked.Decrement(ref connectionsAmount);
             }
             catch (Exception e)
@@ -71,6 +71,31 @@ namespace FileHub.Service.Network
                 throw;
             }
             return webSocketContext.WebSocket;
+        }
+
+        private async Task RouteHttpRequest(HttpListenerRequest httpRequest, WebSocket webSocket)
+        {
+            string[] path = httpRequest.Url.AbsolutePath.Split('/');
+            if (path.Length < 5)
+            {
+                throw new Exception("Invalid request path"); //todo replace with more semantic exception
+            }
+
+            string operation = path[2];
+            string groupId = path[3];
+            string fileName = path[4];
+            WebsocketHandler handler = new WebsocketHandler(webSocket);
+            switch (operation)
+            {
+                case "send": //todo replace constant
+                    await (handler.Read(new BinaryArchitect(fileName, groupId)));
+                    break;
+                case "receive": //todo replace constant
+                    await (handler.Write(new BinaryArchitect(fileName, groupId)));
+                    break;
+                default:
+                    throw new InvalidOperationException($"Invalid Operation: {operation}");
+            }
         }
 
         private void HandleNonWebsocketConnection(HttpListenerContext listenerContext)

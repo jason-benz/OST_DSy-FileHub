@@ -12,12 +12,15 @@ namespace FileHub.Service.Network
 {
     public class WebsocketHandler
     {
-        private const UInt32  kilo = 1024;
+        private const int  Kilo = 1024;
         private WebSocket Socket { get; set; }
-        private UInt64 PartSize { get; set; }
-        public WebsocketHandler(WebSocket webSocket, UInt64 partSize = 8 * kilo)
+        private int PartSize { get; set; }
+        private WebSocketMessageType MessageType { get; set; }
+        public WebsocketHandler(WebSocket webSocket, WebSocketMessageType messageType = WebSocketMessageType.Binary, int partSize = Kilo)
         {
             this.Socket = webSocket;
+            this.PartSize = partSize;
+            this.MessageType = messageType;
         }
 
         public Task Read(IBinaryDataHandler binaryHandler)
@@ -25,35 +28,57 @@ namespace FileHub.Service.Network
             return Task.Run(() =>
             {
                 int partNr = 0;
-                foreach (byte[] part in ReadBinaryData())
+                foreach (DataPart part in ReadData())
                 {
-                    Console.WriteLine($"{partNr++}: {Encoding.Default.GetString(part)}");
+                    Console.WriteLine($"{partNr++}: {Encoding.Default.GetString(part.Data)}");
                 }
             });
         }
 
-        public IEnumerable<byte[]> ReadBinaryData()
+        public Task Write(IBinaryDataHandler binaryHandler)
+        {
+            return Task.Run(() =>
+            {
+                foreach(DataPart data in binaryHandler.ReadParts(PartSize))
+                {
+                    SendBytes(data.Data, data.LastPart);
+                }
+            });
+        }
+
+        private IEnumerable<DataPart> ReadData()
         {
             while (Socket.State == WebSocketState.Open)
             {
-                yield return ReceiveBytes().GetAwaiter().GetResult();
+                byte[] data = ReceiveBytes().GetAwaiter().GetResult();
+                yield return new DataPart{Data = data, LastPart = Socket.State != WebSocketState.Open}; // != open possible, since receivebytes resets it
             }
         }
 
-        public Task<byte[]> ReceiveBytes()
+        private Task<byte[]> ReceiveBytes()
         {
             return Task.Run(() =>
             {
                 byte[] receiveBuffer = new byte[PartSize];
                 WebSocketReceiveResult receiveResult = Socket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None).GetAwaiter().GetResult();
-                if (receiveResult.MessageType != WebSocketMessageType.Binary && receiveResult.MessageType != WebSocketMessageType.Close)
+                if (receiveResult.MessageType == WebSocketMessageType.Close)
+                {
+                    Socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None);
+                }
+                else if (receiveResult.MessageType != MessageType)
                 {
                     Socket.CloseAsync(WebSocketCloseStatus.InvalidMessageType, "Invalid Message Type", CancellationToken.None);
                     throw new InvalidMessageTypeException();
                 }
-                return receiveResult.MessageType == WebSocketMessageType.Binary ?  receiveBuffer : Array.Empty<byte>();
+                return receiveResult.MessageType == MessageType ?  receiveBuffer : Array.Empty<byte>(); 
             });
             
         }
+
+        private void SendBytes(byte[] data, bool endOfMessage)
+        {
+            Socket.SendAsync(new ArraySegment<byte>(data, 0, data.Length), MessageType, endOfMessage,
+                CancellationToken.None).Wait();
+        } 
     }
 }
