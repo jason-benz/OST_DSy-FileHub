@@ -1,10 +1,13 @@
 ﻿@page "/shareFiles"
+@using FileHub.Service.Datahandling
+@using FileHub.Frontend.Network
+@using System.Net.WebSockets
 
 <h3>Share Files</h3>
-<p>You can upload up to @maxAllowedFiles files and share them with your friends</p>
+<p>You can upload up to @MaxAllowedFiles files and share them with your friends</p>
 <InputFile OnChange="@LoadFiles" multiple />
 
-@if (isLoading)
+@if (_isLoading)
 {
     <p>Loading files...</p>
 }
@@ -12,9 +15,9 @@ else
 {
     <br /><br />
 
-    @foreach (var file in loadedFiles)
+    @foreach (var file in _loadedFiles)
     {
-        <h4>@file.Name</h4>
+        <b>@file.Name</b>
         <p>
             Size (bytes): @file.Size
             <br />
@@ -22,29 +25,28 @@ else
         </p>
     }
 
-    @if (loadedFiles.Any())
+    @if (_loadedFiles.Any())
     {
-        <button class="btn btn-primary">Start file upload</button>
+        <button class="btn btn-primary" @onclick="UploadFiles">Start file upload</button>
+        <br />
     }
 }
 
 @code {
-    private List<IBrowserFile> loadedFiles = new();
-    private int maxAllowedFiles = 10;
-    private bool isLoading;
+    private readonly List<IBrowserFile> _loadedFiles = new();
+    private const int MaxAllowedFiles = 5;
+    private bool _isLoading;
 
     private void LoadFiles(InputFileChangeEventArgs e)
     {
-        isLoading = true;
-        loadedFiles.Clear();
+        _isLoading = true;
+        _loadedFiles.Clear();
 
-        var files = e.GetMultipleFiles(maxAllowedFiles);
-
-        foreach (var file in e.GetMultipleFiles(maxAllowedFiles))
+        foreach (var file in e.GetMultipleFiles(MaxAllowedFiles))
         {
             try
             {
-                loadedFiles.Add(file);
+                _loadedFiles.Add(file);
             }
             catch (Exception ex)
             {
@@ -52,6 +54,15 @@ else
             }
         }
 
-        isLoading = false;
+        _isLoading = false;
+    }
+
+    private async Task UploadFiles()
+    {
+        IBinaryDataHandler data = new MockBinaryDataHandler();
+        WebsocketClient client = new(new ClientWebSocket());
+        await client.Connect("ws://localhost:8080/data/send/1/2");
+        client.Send(data);
+        client.Close();
     }
 }
