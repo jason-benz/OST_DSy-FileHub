@@ -21,24 +21,20 @@
             <p class="card-text">You can get access to your friends shared files</p>
             <label>Enter code</label>
             <input type="text" />
-            <button class="btn btn-primary" @onclick="DoStuff">Get files</button>
+            <button class="btn btn-primary" @onclick="GetFiles">Get files</button>
         </div>
     </div>
 </div>
 
 @code {
-
-    private async Task DoStuff()
+    private async Task GetFiles()
     {
-        IBinaryDataHandler Data = new MockBinaryDataHandler();
+        IBinaryDataHandler data = new MockBinaryDataHandler();
         WebsocketClient client = new (new ClientWebSocket());
-    await client.Connect("ws://localhost:8080/data/send/1/2");
-        client.Send(Data);
-        client.Close();
 
-       /* await client.Connect("ws://localhost:8080/data/receive/1/2");
-        await client.Receive(Data);
-        client.Close();*/
+        await client.Connect("ws://localhost:8080/data/receive/1/2");
+        await client.Receive(data);
+        client.Close();
     }
 
 }
