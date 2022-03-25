@@ -1,0 +1,54 @@
+﻿@page "/shareFiles"
+
+<h3>Share Files</h3>
+
+<InputFile OnChange="@LoadFiles" multiple />
+
+@if (isLoading)
+{
+    <p>Uploading...</p>
+}
+else
+{
+    <ul>
+        @foreach (var file in loadedFiles)
+        {
+            <li>
+                <ul>
+                    <li>Name: @file.Name</li>
+                    <li>Last modified: @file.LastModified.ToString("g")</li>
+                    <li>Size (bytes): @file.Size</li>
+                    <li>Content type: @file.ContentType</li>
+                </ul>
+            </li>
+        }
+    </ul>
+}
+
+@code {
+    private List<IBrowserFile> loadedFiles = new();
+    private int maxAllowedFiles = 1;
+    private bool isLoading;
+
+    private void LoadFiles(InputFileChangeEventArgs e)
+    {
+        isLoading = true;
+        loadedFiles.Clear();
+
+        var files = e.GetMultipleFiles(maxAllowedFiles);
+
+        foreach (var file in e.GetMultipleFiles(maxAllowedFiles))
+        {
+            try
+            {
+                loadedFiles.Add(file);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"File: {file.Name} Error: {ex.Message}");
+            }
+        }
+
+        isLoading = false;
+    }
+}

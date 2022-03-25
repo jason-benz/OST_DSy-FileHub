@@ -1,9 +1,24 @@
 ﻿@page "/"
 
-<PageTitle>Index</PageTitle>
+<PageTitle>FileHub</PageTitle>
 
-<h1>Hello, world!</h1>
-
-Welcome to your new app.
-
-<SurveyPrompt Title="How is Blazor working for you?"/>
+<h1>Welcome to FileHub</h1>
+<div class="row row-cols-7">
+    <div class="card col-3">
+        <div class="card-body">
+            <h5 class="card-title">Share files</h5>
+            <p class="card-text">You can share files with your friends</p>
+            <a href="/ShareFiles" class="btn btn-primary">Share files</a>
+        </div>
+    </div>
+    <div class="col-1"></div>
+    <div class="card col-3">
+        <div class="card-body">
+            <h5 class="card-title">Get shared files</h5>
+            <p class="card-text">You can get access to your friends shared files</p>
+            <label>Enter code</label>
+            <input type="text" />
+            <button type="submit" class="btn btn-primary">Get files</button>
+        </div>
+    </div>
+</div>
