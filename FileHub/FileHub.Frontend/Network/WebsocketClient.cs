@@ -41,6 +41,7 @@ namespace FileHub.Frontend.Network
         {
             foreach (DataPart part in binaryHandler.ReadParts(PartSize))
             {
+                Console.WriteLine($"Sending {Encoding.UTF8.GetString(part.Data)}");
                 SendBytes(part.Data ?? Array.Empty<byte>());
             }
         }
@@ -58,7 +59,7 @@ namespace FileHub.Frontend.Network
             while (Socket.State == WebSocketState.Open)
             {
                 byte[] data = await ReceiveBytes();
-                yield return new DataPart{Data = data, LastPart = Socket.State != WebSocketState.Open}; //can be closed, since receivebytes overrides it
+                yield return new DataPart{Data = data, LastPart = Socket.State != WebSocketState.Open, DataLength = data.Length}; //can be closed, since receivebytes overrides it
             }
         }
 
@@ -78,7 +79,6 @@ namespace FileHub.Frontend.Network
             WebSocketReceiveResult receiveResult = await Socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
             if (receiveResult.MessageType == WebSocketMessageType.Close)
             {
-                Console.WriteLine("socket was closed");
                 Socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None);
             }
             else if (receiveResult.MessageType != MessageType)
@@ -86,10 +86,7 @@ namespace FileHub.Frontend.Network
                 Socket.CloseAsync(WebSocketCloseStatus.InvalidMessageType, "Invalid Message Type", CancellationToken.None);
                 throw new Exception("Invalid message type"); //todo semantic exception
             }
-            else
-            {
-                Console.WriteLine("socket ok");
-            }
+
 
             return buffer;
         }

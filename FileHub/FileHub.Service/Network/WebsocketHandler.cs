@@ -49,7 +49,7 @@ namespace FileHub.Service.Network
             while (Socket.State == WebSocketState.Open)
             {
                 byte[] data = ReceiveBytes().GetAwaiter().GetResult();
-                yield return new DataPart{Data = data, LastPart = Socket.State != WebSocketState.Open}; // != open possible, since receivebytes resets it
+                yield return new DataPart{Data = data, LastPart = Socket.State != WebSocketState.Open, DataLength = data.Length}; // != open possible, since receivebytes resets it
             }
         }
 
@@ -68,6 +68,7 @@ namespace FileHub.Service.Network
                     Socket.CloseAsync(WebSocketCloseStatus.InvalidMessageType, "Invalid Message Type", CancellationToken.None);
                     throw new InvalidMessageTypeException();
                 }
+                Array.Resize(ref receiveBuffer, receiveResult.Count);
                 return receiveResult.MessageType == MessageType ?  receiveBuffer : Array.Empty<byte>(); 
             });
             
@@ -75,6 +76,10 @@ namespace FileHub.Service.Network
 
         private void SendBytes(byte[] data)
         {
+            if (Socket.State == WebSocketState.Closed)
+            {
+                throw new Exception("socket was closed while trying to send"); //todo semantic exc
+            }
             Socket.SendAsync(new ArraySegment<byte>(data, 0, data.Length), MessageType, true,
                 CancellationToken.None).Wait();
         } 

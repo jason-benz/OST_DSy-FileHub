@@ -42,7 +42,7 @@ namespace FileHub.Service.Network
             {
                 webSocket = await UpgradeConnectionToWebSocket(listenerContext);
                 await RouteHttpRequest(listenerContext.Request, webSocket);
-                
+                RespondStatus(listenerContext, 400);
                 Interlocked.Decrement(ref connectionsAmount);
             }
             catch (Exception e)
@@ -85,8 +85,8 @@ namespace FileHub.Service.Network
             string groupId = path[3];
             string fileName = path[4];
             WebsocketHandler handler = new WebsocketHandler(webSocket);
-            //var fileHandler = new BinaryArchitect(fileName, groupId); //todo reactivate
-            var fileHandler = new MockBinaryDataHandler();
+            var fileHandler = new BinaryArchitect(fileName, groupId); 
+            
             switch (operation)
             {
                 case "send": //todo replace constant
@@ -98,7 +98,7 @@ namespace FileHub.Service.Network
                 default:
                     throw new InvalidOperationException($"Invalid Operation: {operation}");
             }
-            //fileHandler.Close(); //todo reactivate
+            fileHandler.Close(); 
 
         }
 
