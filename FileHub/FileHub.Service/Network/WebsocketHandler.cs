@@ -25,13 +25,12 @@ namespace FileHub.Service.Network
         {
             return Task.Run(() =>
             {
-                int partNr = 0;
                 foreach (DataPart part in ReadData())
                 {
-                    Console.WriteLine($"{partNr++}: {Encoding.Default.GetString(part.Data)}"); //todo remove
                     binaryHandler.WritePart(part);
                 }
             });
+            
         }
 
         public Task Write(IBinaryDataHandler binaryHandler)
@@ -40,7 +39,7 @@ namespace FileHub.Service.Network
             { 
                 foreach(DataPart data in binaryHandler.ReadParts(PartSize))
                 {
-                    SendBytes(data.Data, data.LastPart);
+                    SendBytes(data.Data);
                 }
             });
         }
@@ -74,9 +73,9 @@ namespace FileHub.Service.Network
             
         }
 
-        private void SendBytes(byte[] data, bool endOfMessage)
+        private void SendBytes(byte[] data)
         {
-            Socket.SendAsync(new ArraySegment<byte>(data, 0, data.Length), MessageType, endOfMessage,
+            Socket.SendAsync(new ArraySegment<byte>(data, 0, data.Length), MessageType, true,
                 CancellationToken.None).Wait();
         } 
     }

@@ -16,4 +16,8 @@
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.3" PrivateAssets="all" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\FileHub.Common\FileHub.Common.csproj" />
+    </ItemGroup>
+
 </Project>

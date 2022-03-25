@@ -85,17 +85,21 @@ namespace FileHub.Service.Network
             string groupId = path[3];
             string fileName = path[4];
             WebsocketHandler handler = new WebsocketHandler(webSocket);
+            //var fileHandler = new BinaryArchitect(fileName, groupId); //todo reactivate
+            var fileHandler = new MockBinaryDataHandler();
             switch (operation)
             {
                 case "send": //todo replace constant
-                    await (handler.Read(new BinaryArchitect(fileName, groupId)));
+                    await (handler.Read(fileHandler));
                     break;
                 case "receive": //todo replace constant
-                    await (handler.Write(new BinaryArchitect(fileName, groupId)));
+                    await (handler.Write(fileHandler));
                     break;
                 default:
                     throw new InvalidOperationException($"Invalid Operation: {operation}");
             }
+            //fileHandler.Close(); //todo reactivate
+
         }
 
         private void HandleNonWebsocketConnection(HttpListenerContext listenerContext)

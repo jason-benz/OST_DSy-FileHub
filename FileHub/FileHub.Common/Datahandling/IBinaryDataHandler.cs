@@ -7,5 +7,6 @@ namespace FileHub.Service.Datahandling
     {
         public void WritePart(DataPart part);
         public IEnumerable<DataPart> ReadParts(int partSizeInBytes);
+        public void Close();
     }
 }

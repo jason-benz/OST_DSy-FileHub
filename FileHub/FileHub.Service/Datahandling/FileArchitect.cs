@@ -8,13 +8,14 @@ namespace FileHub.Service.Datahandling
 {
     public class BinaryArchitect : IBinaryDataHandler
     {
+        private const string DataPath = @"D:\";
         private FileStream FileStream { get; }
         private string GroupId { get; }
         private const string DataFolderName = "data"; //todo: make configurable
 
         public BinaryArchitect(string fileName, string groupId)
         {
-            string fullFilePath = $"./{DataFolderName}/{GroupId}/{fileName}";
+            string fullFilePath = $"./{fileName}";  //$"{DataPath}/{DataFolderName}/{GroupId}/{fileName}";
             FileStream = File.Open(fullFilePath, FileMode.Create);
             GroupId = groupId;
         }
@@ -43,9 +44,13 @@ namespace FileHub.Service.Datahandling
             return new DataPart {Data = data, DataLength = length, LastPart = length < partSizeInBytes}; //todo check if LastPart is asserted correctly
         }
 
-        ~BinaryArchitect()
+        public void Close()
         {
             FileStream.Close();
+        }
+        ~BinaryArchitect()
+        {
+            Close();
         }
     }
 }
