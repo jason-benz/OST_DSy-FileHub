@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Net.WebSockets;
-using System.Reflection.Metadata;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,7 +28,8 @@ namespace FileHub.Service.Network
                 int partNr = 0;
                 foreach (DataPart part in ReadData())
                 {
-                    Console.WriteLine($"{partNr++}: {Encoding.Default.GetString(part.Data)}");
+                    Console.WriteLine($"{partNr++}: {Encoding.Default.GetString(part.Data)}"); //todo remove
+                    binaryHandler.WritePart(part);
                 }
             });
         }
@@ -38,7 +37,7 @@ namespace FileHub.Service.Network
         public Task Write(IBinaryDataHandler binaryHandler)
         {
             return Task.Run(() =>
-            {
+            { 
                 foreach(DataPart data in binaryHandler.ReadParts(PartSize))
                 {
                     SendBytes(data.Data, data.LastPart);
