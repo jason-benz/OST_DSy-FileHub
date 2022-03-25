@@ -1,33 +1,36 @@
 ﻿@page "/shareFiles"
 
 <h3>Share Files</h3>
-
+<p>You can upload up to @maxAllowedFiles files and share them with your friends</p>
 <InputFile OnChange="@LoadFiles" multiple />
 
 @if (isLoading)
 {
-    <p>Uploading...</p>
+    <p>Loading files...</p>
 }
 else
 {
-    <ul>
-        @foreach (var file in loadedFiles)
-        {
-            <li>
-                <ul>
-                    <li>Name: @file.Name</li>
-                    <li>Last modified: @file.LastModified.ToString("g")</li>
-                    <li>Size (bytes): @file.Size</li>
-                    <li>Content type: @file.ContentType</li>
-                </ul>
-            </li>
-        }
-    </ul>
+    <br /><br />
+
+    @foreach (var file in loadedFiles)
+    {
+        <h4>@file.Name</h4>
+        <p>
+            Size (bytes): @file.Size
+            <br />
+            Content type: @file.ContentType
+        </p>
+    }
+
+    @if (loadedFiles.Any())
+    {
+        <button class="btn btn-primary">Start file upload</button>
+    }
 }
 
 @code {
     private List<IBrowserFile> loadedFiles = new();
-    private int maxAllowedFiles = 1;
+    private int maxAllowedFiles = 10;
     private bool isLoading;
 
     private void LoadFiles(InputFileChangeEventArgs e)
