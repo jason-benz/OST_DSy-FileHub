@@ -22,8 +22,15 @@ namespace FileHub.Service.Datahandling
             if (!InUse)
             {
                 FileStream = File.Open(FilePath, FileMode.Create);
+                InUse = true;
             }
+            
             FileStream.Write(part.Data ?? Array.Empty<byte>(), 0, part.DataLength);
+
+            if (part.LastPart)
+            {
+                InUse = false;
+            }
         }
 
         public IEnumerable<DataPart> ReadParts(int partSizeInBytes)
@@ -41,6 +48,8 @@ namespace FileHub.Service.Datahandling
                 yield return dataPart;
                 lastPart = dataPart.LastPart;
             }
+
+            InUse = false;
         }
 
         private DataPart ReadDataPart(int partSizeInBytes)
