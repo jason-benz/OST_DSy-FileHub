@@ -104,7 +104,15 @@ namespace FileHub.Service.Network
 
         private void HandleNonWebsocketConnection(HttpListenerContext listenerContext)
         {
-            RespondStatus(listenerContext, 400);
+            string[] path = listenerContext.Request.Url.AbsolutePath.Split('/');
+            if (path.Length == 2) //health-check-response
+            {
+                RespondStatus(listenerContext, 200);
+            }
+            else
+            {
+                RespondStatus(listenerContext, 400);
+            }
         }
 
         private void HandleUpgradeException(HttpListenerContext listenerContext, Exception e)

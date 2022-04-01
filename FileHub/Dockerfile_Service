@@ -3,9 +3,11 @@ WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["FileHub.Service/FileHub.Service.csproj", "FileHub.Service/"]
-RUN dotnet restore "FileHub.Service/FileHub.Service.csproj"
+COPY FileHub.sln ./
+COPY ["FileHub.Common/*.csproj", "./FileHub.Common/"]
+COPY ["FileHub.Service/*.csproj", "./FileHub.Service/"]
 COPY . .
+RUN dotnet restore "FileHub.Service/FileHub.Service.csproj"
 WORKDIR "/src/FileHub.Service"
 RUN dotnet build "FileHub.Service.csproj" -c Release -o /app/build
 

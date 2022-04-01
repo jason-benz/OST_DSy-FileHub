@@ -1,0 +1,16 @@
+version: '3'
+services:
+  web_lb:
+    build: 
+      context: FileHub/
+      dockerfile: Dockerfile_Frontend
+    ports:
+      - "7070:7070"
+    volumes:
+      - "./FileHub/FileHub.Frontend/Loadbalance/Caddyfile:/etc/caddy/Caddyfile"
+  service:
+    build: 
+      context: FileHub/
+      dockerfile: Dockerfile_Service
+    ports:
+      - "8080-8081:8080"
