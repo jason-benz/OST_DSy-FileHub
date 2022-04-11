@@ -35,9 +35,9 @@ namespace FileHub.Service.Network
 
         public Task Write(IBinaryDataHandler binaryHandler)
         {
-            return Task.Run(() =>
-            { 
-                foreach(DataPart data in binaryHandler.ReadParts(PartSize))
+            return Task.Run(async () =>
+            {
+                await foreach (DataPart data in binaryHandler.ReadPartsAsync(PartSize))
                 {
                     SendBytes(data.Data);
                 }

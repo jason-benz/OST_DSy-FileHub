@@ -11,7 +11,7 @@ namespace FileHub.Service.Datahandling
             Console.WriteLine(Encoding.UTF8.GetString(part.Data));
         }
 
-        public IEnumerable<DataPart> ReadParts(int partSizeInBytes)
+        public async IAsyncEnumerable<DataPart> ReadPartsAsync(int partSizeInBytes)
         {
             yield return new DataPart {Data = Encoding.UTF8.GetBytes("Hello"), DataLength = 5, LastPart = false};
             yield return new DataPart {Data = Encoding.UTF8.GetBytes("World"), DataLength = 5, LastPart = true};

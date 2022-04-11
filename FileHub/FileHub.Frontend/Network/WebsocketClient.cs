@@ -37,9 +37,9 @@ namespace FileHub.Frontend.Network
             Socket?.Dispose();
         }
 
-        public void Send(IBinaryDataHandler binaryHandler)
+        public async Task SendAsync(IBinaryDataHandler binaryHandler)
         {
-            foreach (DataPart part in binaryHandler.ReadParts(PartSize))
+            await foreach (DataPart part in binaryHandler.ReadPartsAsync(PartSize))
             {
                 Console.WriteLine($"Sending {Encoding.UTF8.GetString(part.Data)}");
                 SendBytes(part.Data ?? Array.Empty<byte>());

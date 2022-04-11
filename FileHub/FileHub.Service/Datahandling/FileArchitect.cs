@@ -33,7 +33,7 @@ namespace FileHub.Service.Datahandling
             }
         }
 
-        public IEnumerable<DataPart> ReadParts(int partSizeInBytes)
+        public async IAsyncEnumerable<DataPart> ReadPartsAsync(int partSizeInBytes)
         {
             if (!InUse)
             {
