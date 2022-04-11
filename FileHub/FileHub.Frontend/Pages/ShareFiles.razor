@@ -65,7 +65,7 @@ else
             IBinaryDataHandler data = new BinaryDataHandler(file);
             WebsocketClient client = new(new ClientWebSocket());
         
-            await client.Connect("ws://localhost:8080/dataservice/send/1/2");
+            await client.Connect($"ws://localhost:8080/dataservice/send/1/{file.Name}");
             await client.SendAsync(data);
             client.Close();
         }
