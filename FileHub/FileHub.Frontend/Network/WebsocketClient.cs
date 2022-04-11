@@ -41,7 +41,7 @@ namespace FileHub.Frontend.Network
         {
             await foreach (DataPart part in binaryHandler.ReadPartsAsync(PartSize))
             {
-                Console.WriteLine($"Sending {Encoding.UTF8.GetString(part.Data)}");
+                //Console.WriteLine($"Sending {Encoding.UTF8.GetString(part.Data)}");
                 SendBytes(part.Data ?? Array.Empty<byte>());
             }
         }
