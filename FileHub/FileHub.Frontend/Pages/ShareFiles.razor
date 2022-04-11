@@ -62,7 +62,7 @@ else
         IBinaryDataHandler data = new MockBinaryDataHandler();
         WebsocketClient client = new(new ClientWebSocket());
         
-        await client.Connect("ws://localhost:8080/data/send/1/2");
+        await client.Connect("ws://localhost:8080/dataservice/send/1/2");
         client.Send(data);
         client.Close();
     }

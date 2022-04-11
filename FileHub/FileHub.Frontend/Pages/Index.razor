@@ -32,7 +32,7 @@
         IBinaryDataHandler data = new MockBinaryDataHandler();
         WebsocketClient client = new (new ClientWebSocket());
 
-        await client.Connect("ws://localhost:8080/data/receive/1/2");
+        await client.Connect("ws://localhost:8080/dataservice/receive/1/2");
         await client.Receive(data);
         client.Close();
     }
