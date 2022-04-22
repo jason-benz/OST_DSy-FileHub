@@ -38,40 +38,26 @@ namespace FileHub.Frontend.Network
 
         public async Task<byte[]> Receive(IBinaryDataHandler binaryHandler)
         {
-            //var bytes = new List<byte>();
+            var bytes = new List<byte>();
             
-            // await foreach (DataPart part in ReadData())
-            // {
-            //     bytes.AddRange(part.Data);
-            //     binaryHandler.WritePart(part);
-            // }
+            await foreach (DataPart part in ReadData())
+            {
+                bytes.AddRange(part.Data);
+                //binaryHandler.WritePart(part); // TODO: May move this code section to BinaryDataHandler
+            }
             
-            var bytes = await ReadData();
             return bytes.ToArray();
         }
 
-        private async Task<List<byte>> ReadData()
+        private async IAsyncEnumerable<DataPart> ReadData()
         {
-            var bytes = new List<byte>();
-
             while (Socket.State == WebSocketState.Open)
             {
-                try
-                {
-                    byte[] data = await ReceiveBytes();
-                    bytes.AddRange(data);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex);
-                }
-                
-                //yield return new DataPart{Data = data, LastPart = Socket.State != WebSocketState.Open, DataLength = data.Length}; //can be closed, since receivebytes overrides it
+                byte[] data = await ReceiveBytes();
+                yield return new DataPart  { Data = data, LastPart = Socket.State != WebSocketState.Open, DataLength = data.Length }; //can be closed, since receivebytes overrides it
             }
-            
-            return bytes;
         }
-        
+
         private void SendBytes(byte[] buffer)
         {
             if (Socket.State != WebSocketState.Open)
