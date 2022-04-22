@@ -1,4 +1,6 @@
 ﻿@page "/"
+@inject IJSRuntime JSRuntime
+@using FileHub.Frontend.Datahandling
 @using FileHub.Service.Datahandling
 @using FileHub.Frontend.Network
 @using System.Net.WebSockets
@@ -29,11 +31,16 @@
 @code {
     private async Task GetFiles()
     {
-        IBinaryDataHandler data = new MockBinaryDataHandler();
+        IBinaryDataHandler data = new BinaryDataHandler();
         WebsocketClient client = new (new ClientWebSocket());
 
-        await client.Connect("ws://localhost:8080/dataservice/receive/1/2");
-        await client.Receive(data);
+        var filename = "file.txt"; // TODO: Replace filename
+        var filetype = "text/plain"; // TODO: Replace filetype
+
+        await client.Connect($"ws://localhost:8080/dataservice/receive/1/{filename}");
+        var bytes = await client.Receive(data);
+
+        await JSRuntime.InvokeVoidAsync("DownloadFile", filename, filetype, bytes);
         client.Close();
     }
 

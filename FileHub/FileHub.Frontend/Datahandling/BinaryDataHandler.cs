@@ -7,6 +7,8 @@ namespace FileHub.Frontend.Datahandling
     {
         private readonly IBrowserFile _file;
 
+        public BinaryDataHandler() { }
+
         public BinaryDataHandler(IBrowserFile file)
         {
             _file = file;
