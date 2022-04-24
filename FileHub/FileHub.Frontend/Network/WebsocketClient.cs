@@ -79,11 +79,11 @@ namespace FileHub.Frontend.Network
             WebSocketReceiveResult receiveResult = await Socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
             if (receiveResult.MessageType == WebSocketMessageType.Close)
             {
-                Socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None);
+                await Socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None);
             }
             else if (receiveResult.MessageType != MessageType)
             {
-                Socket.CloseAsync(WebSocketCloseStatus.InvalidMessageType, "Invalid Message Type", CancellationToken.None);
+                await Socket.CloseAsync(WebSocketCloseStatus.InvalidMessageType, "Invalid Message Type", CancellationToken.None);
                 throw new Exception("Invalid message type"); //todo semantic exception
             }
 

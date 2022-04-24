@@ -80,8 +80,10 @@ namespace FileHub.Service.Network
             {
                 throw new Exception("socket was closed while trying to send"); //todo semantic exc
             }
+
             Socket.SendAsync(new ArraySegment<byte>(data, 0, data.Length), MessageType, true,
                 CancellationToken.None).Wait();
+
         } 
     }
 }

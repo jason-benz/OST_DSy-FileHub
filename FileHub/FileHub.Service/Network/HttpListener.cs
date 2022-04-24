@@ -3,6 +3,8 @@ using System.Collections.Specialized;
 using System.Linq.Expressions;
 using System.Net;
 using System.Net.WebSockets;
+using System.Text;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 using FileHub.Service.Datahandling;
@@ -85,7 +87,7 @@ namespace FileHub.Service.Network
             string groupId = path[3];
             string fileName = path[4];
             WebsocketHandler handler = new WebsocketHandler(webSocket);
-            var fileHandler = new BinaryArchitect(fileName, groupId); 
+            IBinaryDataHandler fileHandler = new BinaryArchitect(fileName, groupId); 
             
             switch (operation)
             {
@@ -107,6 +109,16 @@ namespace FileHub.Service.Network
             string[] path = listenerContext.Request.Url.AbsolutePath.Split('/');
             if (path.Length == 2) //health-check-response
             {
+                RespondStatus(listenerContext, 200);
+            }
+            else if (path.Length == 4 && path[2] == "info")
+            {
+                listenerContext.Response.ContentType = "text/plain";
+                foreach (var fileInfo in FolderInfo.GetFileInfos(path[3]))
+                {
+                    var buffer = Encoding.UTF8.GetBytes($"{fileInfo.FileName}:{fileInfo.FileSize},");
+                    listenerContext.Response.OutputStream.Write(buffer);
+                }
                 RespondStatus(listenerContext, 200);
             }
             else

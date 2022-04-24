@@ -8,24 +8,26 @@ namespace FileHub.Service.Datahandling
 {
     public class BinaryArchitect : IBinaryDataHandler
     {
-        private string FilePath { get; set; }
-        private FileStream FileStream { get; set; }
-
+        public static string DataFolderName { get; set; } = "data"; //todo clean
+        
+        private readonly string _filePath;
+        private FileStream _fileStream; 
+        
         private bool InUse { get; set; }
         public BinaryArchitect(string fileName, string groupId)
         {
             
-            FilePath = $"./{fileName}";  //$"./{DataFolderName}/{groupId}/{fileName}";
+            _filePath =  $"./{DataFolderName}/{groupId}/{fileName}";
         }
         public void WritePart(DataPart part)
         {
             if (!InUse)
             {
-                FileStream = File.Open(FilePath, FileMode.Create);
+                _fileStream = File.Open(_filePath, FileMode.Create);
                 InUse = true;
             }
             
-            FileStream.Write(part.Data ?? Array.Empty<byte>(), 0, part.DataLength);
+            _fileStream.Write(part.Data ?? Array.Empty<byte>(), 0, part.DataLength);
 
             if (part.LastPart)
             {
@@ -37,7 +39,7 @@ namespace FileHub.Service.Datahandling
         {
             if (!InUse)
             {
-                FileStream = File.Open(FilePath, FileMode.Open);
+                _fileStream = File.Open(_filePath, FileMode.Open);
             }
             var dataPart = ReadDataPart(partSizeInBytes);
             yield return dataPart;
@@ -55,13 +57,13 @@ namespace FileHub.Service.Datahandling
         private DataPart ReadDataPart(int partSizeInBytes)
         {
             byte[] data = new byte[partSizeInBytes];
-            int length = FileStream.Read(data, 0, partSizeInBytes);
+            int length = _fileStream.Read(data, 0, partSizeInBytes);
             return new DataPart {Data = data, DataLength = length, LastPart = length < partSizeInBytes}; //todo check if LastPart is asserted correctly
         }
 
         public void Close()
         {
-            FileStream.Close();
+            _fileStream.Close();
         }
         ~BinaryArchitect()
         {
