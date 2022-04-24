@@ -9,6 +9,7 @@
 
     <ItemGroup>
       <None Include="wwwroot\assets\logo.png" />
+      <None Include="wwwroot\scripts\FileDownload.js" />
     </ItemGroup>
 
     <ItemGroup>

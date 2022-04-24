@@ -33,15 +33,12 @@ namespace FileHub.Service.Network
             
         }
 
-        public Task Write(IBinaryDataHandler binaryHandler)
+        public async Task Write(IBinaryDataHandler binaryHandler)
         {
-            return Task.Run(async () =>
+            await foreach (DataPart data in binaryHandler.ReadPartsAsync(PartSize))
             {
-                await foreach (DataPart data in binaryHandler.ReadPartsAsync(PartSize))
-                {
-                    SendBytes(data.Data);
-                }
-            });
+                SendBytes(data.Data);
+            }
         }
 
         private IEnumerable<DataPart> ReadData()

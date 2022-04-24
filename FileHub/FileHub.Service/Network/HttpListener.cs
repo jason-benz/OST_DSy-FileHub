@@ -15,6 +15,7 @@ namespace FileHub.Service.Network
     class WebsocketServer
     {
         private int connectionsAmount = 0;
+        private WebSocket webSocket = null;
 
         public async void Start(string listenerPrefix)
         {
@@ -39,12 +40,10 @@ namespace FileHub.Service.Network
 
         private async void ProcessRequest(HttpListenerContext listenerContext)
         {
-            WebSocket webSocket = null;
             try
             {
                 webSocket = await UpgradeConnectionToWebSocket(listenerContext);
                 await RouteHttpRequest(listenerContext.Request, webSocket);
-                RespondStatus(listenerContext, 400);
                 Interlocked.Decrement(ref connectionsAmount);
             }
             catch (Exception e)
@@ -54,6 +53,7 @@ namespace FileHub.Service.Network
             finally
             {
                 Console.WriteLine("Connection closed. Amount: {0}", connectionsAmount);
+                await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
                 webSocket?.Dispose();
             }
         }

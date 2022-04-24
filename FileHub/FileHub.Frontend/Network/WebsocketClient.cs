@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.WebSockets;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Net.WebSockets;
 using FileHub.Service.Datahandling;
 
 namespace FileHub.Frontend.Network
@@ -20,11 +12,10 @@ namespace FileHub.Frontend.Network
         
         public WebsocketClient(ClientWebSocket webSocket, WebSocketMessageType messageType = WebSocketMessageType.Binary, int partSize = Kilo)
         {
-            this.Socket = webSocket;
-            this.PartSize = partSize;
-            this.MessageType = messageType;
+            Socket = webSocket;
+            PartSize = partSize;
+            MessageType = messageType;
         }
-        
         
         public async Task Connect(string uri)
         {
@@ -41,17 +32,21 @@ namespace FileHub.Frontend.Network
         {
             await foreach (DataPart part in binaryHandler.ReadPartsAsync(PartSize))
             {
-                //Console.WriteLine($"Sending {Encoding.UTF8.GetString(part.Data)}");
                 SendBytes(part.Data ?? Array.Empty<byte>());
             }
         }
 
-        public async Task Receive(IBinaryDataHandler binaryHandler)
+        public async Task<byte[]> Receive(IBinaryDataHandler binaryHandler)
         {
+            var bytes = new List<byte>();
+            
             await foreach (DataPart part in ReadData())
             {
-                binaryHandler.WritePart(part);
+                bytes.AddRange(part.Data);
+                //binaryHandler.WritePart(part); // TODO: May move this code section to BinaryDataHandler
             }
+            
+            return bytes.ToArray();
         }
 
         private async IAsyncEnumerable<DataPart> ReadData()
@@ -59,10 +54,9 @@ namespace FileHub.Frontend.Network
             while (Socket.State == WebSocketState.Open)
             {
                 byte[] data = await ReceiveBytes();
-                yield return new DataPart{Data = data, LastPart = Socket.State != WebSocketState.Open, DataLength = data.Length}; //can be closed, since receivebytes overrides it
+                yield return new DataPart  { Data = data, LastPart = Socket.State != WebSocketState.Open, DataLength = data.Length }; //can be closed, since receivebytes overrides it
             }
         }
-
 
         private void SendBytes(byte[] buffer)
         {
@@ -76,17 +70,15 @@ namespace FileHub.Frontend.Network
         private async Task<byte[]> ReceiveBytes()
         {
             byte[] buffer = new byte[PartSize];
-            WebSocketReceiveResult receiveResult = await Socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-            if (receiveResult.MessageType == WebSocketMessageType.Close)
-            {
-                await Socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None);
-            }
-            else if (receiveResult.MessageType != MessageType)
+            WebSocketReceiveResult receiveResult = null;
+            
+            receiveResult = await Socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+            
+            if (receiveResult.MessageType != WebSocketMessageType.Close && receiveResult.MessageType != MessageType)
             {
                 await Socket.CloseAsync(WebSocketCloseStatus.InvalidMessageType, "Invalid Message Type", CancellationToken.None);
                 throw new Exception("Invalid message type"); //todo semantic exception
             }
-
 
             return buffer;
         }
