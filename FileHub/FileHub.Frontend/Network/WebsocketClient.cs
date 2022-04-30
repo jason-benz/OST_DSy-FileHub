@@ -1,4 +1,5 @@
 ﻿using System.Net.WebSockets;
+using System.Text;
 using FileHub.Service.Datahandling;
 
 namespace FileHub.Frontend.Network
@@ -32,7 +33,9 @@ namespace FileHub.Frontend.Network
         {
             await foreach (DataPart part in binaryHandler.ReadPartsAsync(PartSize))
             {
-                SendBytes(part.Data ?? Array.Empty<byte>());
+                var buffer = part.Data;
+                Array.Resize(ref buffer, part.DataLength);
+                SendBytes(buffer);
             }
         }
 
@@ -42,7 +45,9 @@ namespace FileHub.Frontend.Network
             
             await foreach (DataPart part in ReadData())
             {
-                bytes.AddRange(part.Data);
+                var arr = part.Data;
+                Array.Resize(ref arr, part.DataLength);
+                bytes.AddRange(arr);
                 //binaryHandler.WritePart(part); // TODO: May move this code section to BinaryDataHandler
             }
             
@@ -53,8 +58,10 @@ namespace FileHub.Frontend.Network
         {
             while (Socket.State == WebSocketState.Open)
             {
-                byte[] data = await ReceiveBytes();
-                yield return new DataPart  { Data = data, LastPart = Socket.State != WebSocketState.Open, DataLength = data.Length }; //can be closed, since receivebytes overrides it
+                var part = await ReceiveBytes();
+                part.LastPart = Socket.State != WebSocketState.Open;
+                Console.WriteLine($"Received result: {Encoding.UTF8.GetString(part.Data)}, of Length: {part.DataLength}"); //todo remove
+                yield return part;
             }
         }
 
@@ -67,7 +74,7 @@ namespace FileHub.Frontend.Network
             Socket.SendAsync(new ArraySegment<byte>(buffer), MessageType, true, CancellationToken.None);
         }
         
-        private async Task<byte[]> ReceiveBytes()
+        private async Task<DataPart> ReceiveBytes()
         {
             byte[] buffer = new byte[PartSize];
             WebSocketReceiveResult receiveResult = null;
@@ -80,7 +87,7 @@ namespace FileHub.Frontend.Network
                 throw new Exception("Invalid message type"); //todo semantic exception
             }
 
-            return buffer;
+            return new DataPart() {Data = buffer, DataLength = receiveResult.Count};
         }
     }
 }

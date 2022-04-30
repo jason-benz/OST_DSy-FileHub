@@ -11,19 +11,20 @@ namespace FileHub.Service.Datahandling
         public static string DataFolderName { get; set; } = "data"; //todo clean
         
         private readonly string _filePath;
-        private FileStream _fileStream; 
-        
+        private FileStream _fileStream;
+        private readonly string _groupId;
         private bool InUse { get; set; }
         public BinaryArchitect(string fileName, string groupId)
         {
-            
+
+            _groupId = groupId;
             _filePath =  $"./{DataFolderName}/{groupId}/{fileName}";
         }
         public void WritePart(DataPart part)
         {
             if (!InUse)
             {
-                _fileStream = File.Open(_filePath, FileMode.Create);
+                OpenFile(FileMode.Create);
                 InUse = true;
             }
             
@@ -39,7 +40,7 @@ namespace FileHub.Service.Datahandling
         {
             if (!InUse)
             {
-                _fileStream = File.Open(_filePath, FileMode.Open);
+                OpenFile(FileMode.Open);
             }
             var dataPart = ReadDataPart(partSizeInBytes);
             yield return dataPart;
@@ -68,6 +69,16 @@ namespace FileHub.Service.Datahandling
         ~BinaryArchitect()
         {
             this?.Close();
+        }
+
+        private void OpenFile(FileMode fileMode)
+        {
+            if (!Directory.Exists($"{DataFolderName}/{_groupId}"))
+            {
+                Directory.CreateDirectory($"{DataFolderName}/{_groupId}");
+            }
+
+            _fileStream = File.Open(_filePath, fileMode);
         }
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net.WebSockets;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -37,7 +38,7 @@ namespace FileHub.Service.Network
         {
             await foreach (DataPart data in binaryHandler.ReadPartsAsync(PartSize))
             {
-                SendBytes(data.Data);
+                SendBytes(data.Data, data.DataLength);
             }
         }
 
@@ -45,12 +46,14 @@ namespace FileHub.Service.Network
         {
             while (Socket.State == WebSocketState.Open)
             {
-                byte[] data = ReceiveBytes().GetAwaiter().GetResult();
-                yield return new DataPart{Data = data, LastPart = Socket.State != WebSocketState.Open, DataLength = data.Length}; // != open possible, since receivebytes resets it
+                var part = ReceiveBytes().Result;
+                part.LastPart = Socket.State != WebSocketState.Open;
+                Console.WriteLine($"Server Receive: {Encoding.UTF8.GetString(part.Data)}, of length: {part.DataLength}");
+                yield return part;
             }
         }
 
-        private Task<byte[]> ReceiveBytes()
+        private Task<DataPart> ReceiveBytes()
         {
             return Task.Run(() =>
             {
@@ -66,21 +69,21 @@ namespace FileHub.Service.Network
                     throw new InvalidMessageTypeException();
                 }
                 Array.Resize(ref receiveBuffer, receiveResult.Count);
-                return receiveResult.MessageType == MessageType ?  receiveBuffer : Array.Empty<byte>(); 
+                return new DataPart() {Data = receiveBuffer, DataLength = receiveResult.Count};
             });
             
         }
 
-        private void SendBytes(byte[] data)
+        private void SendBytes(byte[] data, int length)
         {
             if (Socket.State == WebSocketState.Closed)
             {
                 throw new Exception("socket was closed while trying to send"); //todo semantic exc
             }
 
-            Socket.SendAsync(new ArraySegment<byte>(data, 0, data.Length), MessageType, true,
+            Socket.SendAsync(new ArraySegment<byte>(data, 0, length), MessageType, true,
                 CancellationToken.None).Wait();
-
+            Console.WriteLine($"Sent: {Encoding.UTF8.GetString(data)}, of length: {length}"); //todo remove
         } 
     }
 }

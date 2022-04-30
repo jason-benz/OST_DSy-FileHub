@@ -53,7 +53,8 @@ namespace FileHub.Service.Network
             finally
             {
                 Console.WriteLine("Connection closed. Amount: {0}", connectionsAmount);
-                await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
+                if(webSocket.State == WebSocketState.Open)
+                    await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
                 webSocket?.Dispose();
             }
         }
