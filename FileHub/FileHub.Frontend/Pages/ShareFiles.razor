@@ -1,5 +1,7 @@
 ﻿@page "/shareFiles"
 
+@inject IConfiguration _configuration;
+
 @using FileHub.Frontend.Datahandling
 @using FileHub.Service.Datahandling
 @using FileHub.Frontend.Network
@@ -72,10 +74,15 @@ else
         foreach (var file in _loadedFiles)
         {
             IBinaryDataHandler data = new BinaryDataHandler(file);
-            WebsocketClient client = new(new ClientWebSocket());
-        
-            await client.Connect($"ws://localhost:8080/dataservice/send/{_groupId}/{file.Name}");
-            await client.SendAsync(data);
+            WebsocketClient client;
+            bool success;
+            
+            do
+            {
+                client = new(new ClientWebSocket());
+                success = await client.Connect($"ws://localhost:7070/dataservice/send/{_groupId}/{file.Name}") && await client.SendAsync(data);
+            } while (!success);
+
             client.Close();
         }
     }

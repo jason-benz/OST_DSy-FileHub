@@ -3,9 +3,11 @@ handle /dataservice* {
     reverse_proxy * {
         to http://filehub-service-1:8080
         to http://filehub-service-2:8080
+        
         health_uri /dataservice
         health_interval 1s
         health_status 200
+        health_timeout 10s
     }
 }
 handle * {

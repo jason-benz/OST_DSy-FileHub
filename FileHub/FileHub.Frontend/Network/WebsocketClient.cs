@@ -18,10 +18,20 @@ namespace FileHub.Frontend.Network
             MessageType = messageType;
         }
         
-        public async Task Connect(string uri)
+        public async Task<bool> Connect(string uri)
         {
             Socket = new ClientWebSocket();
-            await Socket.ConnectAsync(new Uri(uri), CancellationToken.None);
+
+            try
+            {
+                await Socket.ConnectAsync(new Uri(uri), CancellationToken.None);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
         }
 
         public void Close()
@@ -29,13 +39,23 @@ namespace FileHub.Frontend.Network
             Socket?.Dispose();
         }
 
-        public async Task SendAsync(IBinaryDataHandler binaryHandler)
+        public async Task<bool> SendAsync(IBinaryDataHandler binaryHandler)
         {
-            await foreach (DataPart part in binaryHandler.ReadPartsAsync(PartSize))
+            try
             {
-                var buffer = part.Data;
-                Array.Resize(ref buffer, part.DataLength);
-                SendBytes(buffer);
+                await foreach (DataPart part in binaryHandler.ReadPartsAsync(PartSize))
+                {
+                    var buffer = part.Data;
+                    Array.Resize(ref buffer, part.DataLength);
+                    SendBytes(buffer);
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
             }
         }
 
@@ -60,7 +80,7 @@ namespace FileHub.Frontend.Network
             {
                 var part = await ReceiveBytes();
                 part.LastPart = Socket.State != WebSocketState.Open;
-                Console.WriteLine($"Received result: {Encoding.UTF8.GetString(part.Data)}, of Length: {part.DataLength}"); //todo remove
+                //Console.WriteLine($"Received result: {Encoding.UTF8.GetString(part.Data)}, of Length: {part.DataLength}"); //todo remove
                 yield return part;
             }
         }
