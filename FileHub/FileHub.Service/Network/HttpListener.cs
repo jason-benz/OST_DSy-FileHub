@@ -1,12 +1,6 @@
-using System;
-using System.Collections.Specialized;
-using System.Linq.Expressions;
 using System.Net;
 using System.Net.WebSockets;
 using System.Text;
-using System.Text.Json.Nodes;
-using System.Threading;
-using System.Threading.Tasks;
 using FileHub.Service.Datahandling;
 
 namespace FileHub.Service.Network
@@ -33,6 +27,7 @@ namespace FileHub.Service.Network
                 }
                 else
                 {
+                    listenerContext.Response.AddHeader("Access-Control-Allow-Origin", "*");
                     HandleNonWebsocketConnection(listenerContext);
                 }
             }
@@ -53,6 +48,7 @@ namespace FileHub.Service.Network
             finally
             {
                 Console.WriteLine("Connection closed. Amount: {0}", connectionsAmount);
+                Thread.Sleep(100);
                 if(webSocket.State == WebSocketState.Open)
                     await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
                 webSocket?.Dispose();
