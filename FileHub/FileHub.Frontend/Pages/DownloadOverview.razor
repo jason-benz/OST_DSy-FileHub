@@ -2,11 +2,11 @@
 
 @using FileHub.Frontend.Network
 @using System.Net.WebSockets
-@using System.Text
 @using FileHub.Frontend.Datahandling
 @using FileHub.Service.Datahandling
 
 @inject HttpClient _http
+@inject IConfiguration _configuration;
 @inject IJSRuntime _jsRuntime
 
 <h3>File overview</h3>
@@ -47,6 +47,8 @@ else
 @code {
     private bool _isLoading;
     private Dictionary<string, string> _fileInfos = new();
+    private string _httpBaseUrl;
+    private string _wsBaseUrl;
 
     [Parameter]
     public string GroupId { get; set; } = string.Empty;
@@ -54,9 +56,11 @@ else
     protected override async void OnInitialized()
     {
         _isLoading = true;
-        var url = $"http://localhost:8080/dataservice/info/{GroupId}";
-
-        var response = await _http.GetAsync(url);
+        
+        _httpBaseUrl = _configuration.GetConnectionString("HttpBaseUrl");
+        _wsBaseUrl = _configuration.GetConnectionString("WsBaseUrl");
+        
+        var response = await _http.GetAsync($"{_httpBaseUrl}/info/{GroupId}");
         var fileInfoRaw = await response.Content.ReadAsStringAsync();
 
         if (!string.IsNullOrWhiteSpace(fileInfoRaw))
@@ -67,6 +71,7 @@ else
                 .Select(f => f.Split(':'))
                 .ToDictionary(d => d[0], d => d[1]);
         }
+        
         _isLoading = false;
         StateHasChanged();
     }
@@ -76,11 +81,9 @@ else
         WebsocketClient client = new (new ClientWebSocket());
         IBinaryDataHandler data = new BinaryDataHandler();
         
-        await client.Connect($"ws://localhost:8080/dataservice/receive/{GroupId}/{filename}");
+        await client.Connect($"{_wsBaseUrl}/receive/{GroupId}/{filename}");
         var bytes = await client.Receive(data);
 
-        Console.WriteLine(Encoding.UTF8.GetString(bytes)[bytes.Length-1]);
-        
         await _jsRuntime.InvokeVoidAsync("DownloadFile", filename, "application/octet-stream", bytes);
         client.Close();
     }

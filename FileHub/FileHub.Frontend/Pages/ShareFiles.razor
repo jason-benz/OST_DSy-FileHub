@@ -71,16 +71,18 @@ else
 
     private async Task UploadFiles()
     {
+        var baseUrl = _configuration.GetConnectionString("WsBaseUrl");
+        
         foreach (var file in _loadedFiles)
         {
-            IBinaryDataHandler data = new BinaryDataHandler(file);
-            WebsocketClient client;
             bool success;
+            WebsocketClient client;
+            IBinaryDataHandler data = new BinaryDataHandler(file);
             
             do
             {
                 client = new(new ClientWebSocket());
-                success = await client.Connect($"ws://localhost:7070/dataservice/send/{_groupId}/{file.Name}") && await client.SendAsync(data);
+                success = await client.Connect($"{baseUrl}/send/{_groupId}/{file.Name}") && await client.SendAsync(data);
             } while (!success);
 
             client.Close();
