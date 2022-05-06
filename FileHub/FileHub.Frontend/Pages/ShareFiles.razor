@@ -1,11 +1,13 @@
 ﻿@page "/shareFiles"
+
 @using FileHub.Frontend.Datahandling
 @using FileHub.Service.Datahandling
 @using FileHub.Frontend.Network
 @using System.Net.WebSockets
 
 <h3>Share Files</h3>
-<p>You can upload up to @MaxAllowedFiles files and share them with your friends</p>
+<b>Your share code: @_groupId</b>
+<p>You can upload up to @MaxAllowedFiles files with a size up to 500MB per file and share them with your friends</p>
 <InputFile OnChange="@LoadFiles" multiple />
 
 @if (_isLoading)
@@ -37,7 +39,14 @@ else
     private readonly List<IBrowserFile> _loadedFiles = new();
     private const int MaxAllowedFiles = 5;
     private bool _isLoading;
-
+    private string _groupId;
+    
+    public ShareFiles()
+    {
+        int randomNumber = new Random().Next(10,99);
+        _groupId = randomNumber + DateTime.Now.ToString("ssyyddmmhhMM"); 
+    }
+    
     private void LoadFiles(InputFileChangeEventArgs e)
     {
         _isLoading = true;
@@ -65,7 +74,7 @@ else
             IBinaryDataHandler data = new BinaryDataHandler(file);
             WebsocketClient client = new(new ClientWebSocket());
         
-            await client.Connect($"ws://localhost:8080/dataservice/send/1/{file.Name}");
+            await client.Connect($"ws://localhost:8080/dataservice/send/{_groupId}/{file.Name}");
             await client.SendAsync(data);
             client.Close();
         }
