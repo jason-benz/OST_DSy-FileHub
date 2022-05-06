@@ -23,7 +23,7 @@ public class FolderInfo
         List<FileInfo> infos = new();
         for (int i = 0; i < fileNames.Length; i++)
         {
-            var fileName = fileNames[i].Split("/")[3];
+            var fileName = Path.GetFileName(fileNames[i]);
             infos.Add( new FileInfo()
             {
                 FileName = fileName, 
