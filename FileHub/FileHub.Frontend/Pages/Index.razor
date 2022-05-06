@@ -1,13 +1,9 @@
 ﻿@page "/"
-@inject IJSRuntime JSRuntime
-@using FileHub.Frontend.Datahandling
-@using FileHub.Service.Datahandling
-@using FileHub.Frontend.Network
-@using System.Net.WebSockets
 
 <PageTitle>FileHub</PageTitle>
 
 <h1>Welcome to FileHub</h1>
+<p>Share files with your friends, with a size per file up to 500 MB for free!</p>
 <div class="row row-cols-7">
     <div class="card col-3">
         <div class="card-body">
@@ -22,26 +18,12 @@
             <h5 class="card-title">Get shared files</h5>
             <p class="card-text">You can get access to your friends shared files</p>
             <label>Enter code</label>
-            <input type="text" />
-            <button class="btn btn-primary" @onclick="GetFiles">Get files</button>
+            <input type="text" @bind-value="_groupId" />
+            <NavLink href=@{$"DownloadOverview/{_groupId}"}><button class="btn btn-primary">Get files</button></NavLink>
         </div>
     </div>
 </div>
 
 @code {
-    private async Task GetFiles()
-    {
-        IBinaryDataHandler data = new BinaryDataHandler();
-        WebsocketClient client = new (new ClientWebSocket());
-
-        var filename = "file.txt"; // TODO: Replace filename
-        var filetype = "text/plain"; // TODO: Replace filetype
-
-        await client.Connect($"ws://localhost:8080/dataservice/receive/1/{filename}");
-        var bytes = await client.Receive(data);
-
-        await JSRuntime.InvokeVoidAsync("DownloadFile", filename, filetype, bytes);
-        client.Close();
-    }
-
+    private string _groupId = string.Empty;
 }

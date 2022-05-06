@@ -1,0 +1,87 @@
+﻿@page "/downloadOverview/{GroupId?}"
+
+@using FileHub.Frontend.Network
+@using System.Net.WebSockets
+@using System.Text
+@using FileHub.Frontend.Datahandling
+@using FileHub.Service.Datahandling
+
+@inject HttpClient _http
+@inject IJSRuntime _jsRuntime
+
+<h3>File overview</h3>
+<b>Used share code: @GroupId</b>
+<br/><br/>
+
+@if (_isLoading)
+{
+    <p>Loading ...</p>
+}
+else
+{
+    @if (_fileInfos.Any())
+    {
+        <table class="download-table">
+            <tr>
+                <th>Filename</th>
+                <th>Filesize</th>
+                <th></th>
+            </tr>
+    
+            @foreach (var fileInfo in _fileInfos)
+            {
+                <tr>
+                    <td>@fileInfo.Key</td>
+                    <td>@fileInfo.Value</td>
+                    <td><input type="button" class="btn btn-primary" value="Download" @onclick="() => DownloadFile(fileInfo.Key)"/></td>
+                </tr>
+            }
+        </table>
+    }
+    else
+    {
+        <p>No files found with this group id. Please try another one.</p>
+    }
+}
+
+@code {
+    private bool _isLoading;
+    private Dictionary<string, string> _fileInfos = new();
+
+    [Parameter]
+    public string GroupId { get; set; } = string.Empty;
+
+    protected override async void OnInitialized()
+    {
+        _isLoading = true;
+        var url = $"http://localhost:8080/dataservice/info/{GroupId}";
+
+        var response = await _http.GetAsync(url);
+        var fileInfoRaw = await response.Content.ReadAsStringAsync();
+
+        if (!string.IsNullOrWhiteSpace(fileInfoRaw))
+        {
+            _fileInfos = fileInfoRaw
+                .TrimEnd(',')
+                .Split(',')
+                .Select(f => f.Split(':'))
+                .ToDictionary(d => d[0], d => d[1]);
+        }
+        _isLoading = false;
+        StateHasChanged();
+    }
+
+    private async Task DownloadFile(string filename)
+    {
+        WebsocketClient client = new (new ClientWebSocket());
+        IBinaryDataHandler data = new BinaryDataHandler();
+        
+        await client.Connect($"ws://localhost:8080/dataservice/receive/{GroupId}/{filename}");
+        var bytes = await client.Receive(data);
+
+        Console.WriteLine(Encoding.UTF8.GetString(bytes)[bytes.Length-1]);
+        
+        await _jsRuntime.InvokeVoidAsync("DownloadFile", filename, "application/octet-stream", bytes);
+        client.Close();
+    }
+}

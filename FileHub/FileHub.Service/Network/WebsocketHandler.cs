@@ -48,7 +48,7 @@ namespace FileHub.Service.Network
             {
                 var part = ReceiveBytes().Result;
                 part.LastPart = Socket.State != WebSocketState.Open;
-                Console.WriteLine($"Server Receive: {Encoding.UTF8.GetString(part.Data)}, of length: {part.DataLength}");
+                //Console.WriteLine($"Server Receive: {Encoding.UTF8.GetString(part.Data)}, of length: {part.DataLength}");
                 yield return part;
             }
         }
@@ -83,7 +83,7 @@ namespace FileHub.Service.Network
 
             Socket.SendAsync(new ArraySegment<byte>(data, 0, length), MessageType, true,
                 CancellationToken.None).Wait();
-            Console.WriteLine($"Sent: {Encoding.UTF8.GetString(data)}, of length: {length}"); //todo remove
+            //Console.WriteLine($"Sent: {Encoding.UTF8.GetString(data)}, of length: {length}"); //todo remove
         } 
     }
 }
