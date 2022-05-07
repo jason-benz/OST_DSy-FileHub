@@ -62,7 +62,7 @@ namespace FileHub.Frontend.Network
         public async Task<byte[]> Receive(IBinaryDataHandler binaryHandler)
         {
             var bytes = new List<byte>();
-            
+
             await foreach (DataPart part in ReadData())
             {
                 var arr = part.Data;
@@ -70,7 +70,7 @@ namespace FileHub.Frontend.Network
                 bytes.AddRange(arr);
                 //binaryHandler.WritePart(part); // TODO: May move this code section to BinaryDataHandler
             }
-            
+
             return bytes.ToArray();
         }
 
@@ -99,14 +99,23 @@ namespace FileHub.Frontend.Network
             byte[] buffer = new byte[PartSize];
             WebSocketReceiveResult receiveResult = null;
             
-            receiveResult = await Socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+            try
+            {
+                var timeOut = new CancellationTokenSource(2000).Token;
+                receiveResult = await Socket.ReceiveAsync(new ArraySegment<byte>(buffer), timeOut);
+            }
+            catch (OperationCanceledException)
+            {
+                Console.WriteLine("Timeout reached");
+                return new DataPart() {Data = buffer, DataLength = 0};
+            }
             
             if (receiveResult.MessageType != WebSocketMessageType.Close && receiveResult.MessageType != MessageType)
             {
                 await Socket.CloseAsync(WebSocketCloseStatus.InvalidMessageType, "Invalid Message Type", CancellationToken.None);
                 throw new Exception("Invalid message type"); //todo semantic exception
             }
-
+            
             return new DataPart() {Data = buffer, DataLength = receiveResult.Count};
         }
     }

@@ -33,7 +33,7 @@ else
                 <tr>
                     <td>@fileInfo.Key</td>
                     <td>@fileInfo.Value</td>
-                    <td><input type="button" class="btn btn-primary" value="Download" @onclick="() => DownloadFile(fileInfo.Key)"/></td>
+                    <td><input type="button" class="btn btn-primary" value="Download" @onclick="() => DownloadFile(fileInfo)"/></td>
                 </tr>
             }
         </table>
@@ -81,19 +81,33 @@ else
         StateHasChanged();
     }
 
-    private async Task DownloadFile(string filename)
+    private async Task DownloadFile(KeyValuePair<string, string> fileInfo)
     {
-        _message = "Your download is being prepared. Please wait a moment.";
-        
-        WebsocketClient client = new (new ClientWebSocket());
+        bool success;
+        WebsocketClient client;
         IBinaryDataHandler data = new BinaryDataHandler();
         
-        await client.Connect($"{_wsBaseUrl}/receive/{GroupId}/{filename}");
-        var bytes = await client.Receive(data);
+        _message = "Your download is being prepared. Please wait a moment.";
 
-        await _jsRuntime.InvokeVoidAsync("DownloadFile", filename, "application/octet-stream", bytes);
+        do
+        {
+            client = new WebsocketClient(new ClientWebSocket());
+            await client.Connect($"{_wsBaseUrl}/receive/{GroupId}/{fileInfo.Key}");
+            var bytes = await client.Receive(data);
+            
+            if (bytes.Length == int.Parse(fileInfo.Value))
+            {
+                success = true;
+                await _jsRuntime.InvokeVoidAsync("DownloadFile", fileInfo.Key, "application/octet-stream", bytes);
+            }
+            else
+            {
+                Console.WriteLine("Try to reconnect...");
+                success = false;
+            }
+        } while (!success);
+        
         client.Close();
-
         _message = "Thanks for using FileHub.";
     }
 }
