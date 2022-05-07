@@ -17,9 +17,9 @@ namespace FileHub.Service.Network
         private WebSocketMessageType MessageType { get; set; }
         public WebsocketHandler(WebSocket webSocket, WebSocketMessageType messageType = WebSocketMessageType.Binary, int partSize = Size)
         {
-            this.Socket = webSocket;
-            this.PartSize = partSize;
-            this.MessageType = messageType;
+            Socket = webSocket;
+            PartSize = partSize;
+            MessageType = messageType;
         }
 
         public Task Read(IBinaryDataHandler binaryHandler)
@@ -81,9 +81,7 @@ namespace FileHub.Service.Network
                 throw new Exception("socket was closed while trying to send"); //todo semantic exc
             }
 
-            Socket.SendAsync(new ArraySegment<byte>(data, 0, length), MessageType, true,
-                CancellationToken.None).Wait();
-            //Console.WriteLine($"Sent: {Encoding.UTF8.GetString(data)}, of length: {length}"); //todo remove
+            Socket.SendAsync(new ArraySegment<byte>(data, 0, length), MessageType, true, CancellationToken.None).Wait();
         } 
     }
 }

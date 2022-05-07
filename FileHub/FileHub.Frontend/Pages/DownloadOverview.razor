@@ -2,8 +2,6 @@
 
 @using FileHub.Frontend.Network
 @using System.Net.WebSockets
-@using FileHub.Frontend.Datahandling
-@using FileHub.Service.Datahandling
 
 @inject HttpClient _http
 @inject IConfiguration _configuration;
@@ -85,15 +83,13 @@ else
     {
         bool success;
         WebsocketClient client;
-        IBinaryDataHandler data = new BinaryDataHandler();
-        
         _message = "Your download is being prepared. Please wait a moment.";
 
         do
         {
             client = new WebsocketClient(new ClientWebSocket());
             await client.Connect($"{_wsBaseUrl}/receive/{GroupId}/{fileInfo.Key}");
-            var bytes = await client.Receive(data);
+            var bytes = await client.Receive();
             
             if (bytes.Length == int.Parse(fileInfo.Value))
             {

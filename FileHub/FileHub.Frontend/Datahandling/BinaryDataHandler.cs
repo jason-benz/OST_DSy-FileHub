@@ -30,11 +30,13 @@ namespace FileHub.Frontend.Datahandling
 
         public void WritePart(DataPart part)
         {
+            // This functionality is implemented in the view
             throw new NotImplementedException();
         }
 
         public void Close()
         {
+            // This functionality is implemented in the view
             throw new NotImplementedException();
         }
     }

@@ -69,14 +69,12 @@ else
 
     private async Task UploadFiles()
     {
-        _message = "Upload started. It may take a while. Please do not refresh the site.";
-        
-        var baseUrl = _configuration.GetConnectionString("WsBaseUrl");
-        
         bool success;
         WebsocketClient client;
         IBinaryDataHandler data = new BinaryDataHandler(_loadedFile);
-            
+        var baseUrl = _configuration.GetConnectionString("WsBaseUrl");
+        _message = "Upload started. It may take a while. Please do not refresh the site.";
+        
         do
         {
             client = new WebsocketClient(new ClientWebSocket());

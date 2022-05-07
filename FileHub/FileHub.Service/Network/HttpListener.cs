@@ -8,8 +8,8 @@ namespace FileHub.Service.Network
     //example used: https://github.com/paulbatum/WebSocket-Samples/blob/master/HttpListenerWebSocketEcho/Server/Server.cs
     class WebsocketServer
     {
-        private int connectionsAmount = 0;
-        private WebSocket webSocket = null;
+        private int connectionsAmount;
+        private WebSocket webSocket;
 
         public async void Start(string listenerPrefix)
         {
@@ -57,7 +57,8 @@ namespace FileHub.Service.Network
 
         private async Task<WebSocket> UpgradeConnectionToWebSocket(HttpListenerContext listenerContext)
         {
-            WebSocketContext webSocketContext = null;
+            WebSocketContext webSocketContext;
+            
             try
             {
                 webSocketContext = await listenerContext.AcceptWebSocketAsync(null);
@@ -69,6 +70,7 @@ namespace FileHub.Service.Network
                 HandleUpgradeException(listenerContext, e);
                 throw;
             }
+            
             return webSocketContext.WebSocket;
         }
 

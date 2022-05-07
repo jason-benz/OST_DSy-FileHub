@@ -1,5 +1,4 @@
 ﻿using System.Net.WebSockets;
-using System.Text;
 using FileHub.Service.Datahandling;
 
 namespace FileHub.Frontend.Network
@@ -59,7 +58,7 @@ namespace FileHub.Frontend.Network
             }
         }
 
-        public async Task<byte[]> Receive(IBinaryDataHandler binaryHandler)
+        public async Task<byte[]> Receive()
         {
             var bytes = new List<byte>();
 
@@ -68,7 +67,6 @@ namespace FileHub.Frontend.Network
                 var arr = part.Data;
                 Array.Resize(ref arr, part.DataLength);
                 bytes.AddRange(arr);
-                //binaryHandler.WritePart(part); // TODO: May move this code section to BinaryDataHandler
             }
 
             return bytes.ToArray();
@@ -80,7 +78,6 @@ namespace FileHub.Frontend.Network
             {
                 var part = await ReceiveBytes();
                 part.LastPart = Socket.State != WebSocketState.Open;
-                //Console.WriteLine($"Received result: {Encoding.UTF8.GetString(part.Data)}, of Length: {part.DataLength}"); //todo remove
                 yield return part;
             }
         }
@@ -89,7 +86,7 @@ namespace FileHub.Frontend.Network
         {
             if (Socket.State != WebSocketState.Open)
             {
-                throw new Exception("socketstateclosed"); //Todo make semantic exception
+                throw new Exception("socketstateclosed");
             }
             Socket.SendAsync(new ArraySegment<byte>(buffer), MessageType, true, CancellationToken.None);
         }
@@ -113,7 +110,7 @@ namespace FileHub.Frontend.Network
             if (receiveResult.MessageType != WebSocketMessageType.Close && receiveResult.MessageType != MessageType)
             {
                 await Socket.CloseAsync(WebSocketCloseStatus.InvalidMessageType, "Invalid Message Type", CancellationToken.None);
-                throw new Exception("Invalid message type"); //todo semantic exception
+                throw new Exception("Invalid message type");
             }
             
             return new DataPart() {Data = buffer, DataLength = receiveResult.Count};

@@ -1,29 +1,28 @@
-using Microsoft.VisualBasic;
-
 namespace FileHub.Service.Datahandling;
 
 public class FolderInfo
 {
-    public static string DataFolderName { get; set; } = "data"; //todo clean
-    
+    public static string DataFolderName => "data";
+
     public static ICollection<FileInfo> GetFileInfos(string groupId)
     {
         string folderPath = $"./{DataFolderName}/{groupId}";
-        string[]? fileNames = null;
+        string[]? fileNames;
+        
         try
         {
             fileNames = Directory.GetFiles(folderPath);
 
         }
-        catch (DirectoryNotFoundException e)
+        catch (DirectoryNotFoundException)
         {
             return new List<FileInfo>();
         }
 
         List<FileInfo> infos = new();
-        for (int i = 0; i < fileNames.Length; i++)
+        foreach (var t in fileNames)
         {
-            var fileName = Path.GetFileName(fileNames[i]);
+            var fileName = Path.GetFileName(t);
             infos.Add( new FileInfo()
             {
                 FileName = fileName, 
