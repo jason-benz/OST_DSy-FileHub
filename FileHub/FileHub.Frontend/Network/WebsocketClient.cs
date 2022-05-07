@@ -6,12 +6,12 @@ namespace FileHub.Frontend.Network
 {
     public class WebsocketClient
     {
-        private const int  Kilo = 1024;
+        private const int  Size = 128 * 1024;
         private ClientWebSocket Socket { get; set; }
         private int PartSize { get; set; }
         private WebSocketMessageType MessageType { get; set; }
         
-        public WebsocketClient(ClientWebSocket webSocket, WebSocketMessageType messageType = WebSocketMessageType.Binary, int partSize = Kilo)
+        public WebsocketClient(ClientWebSocket webSocket, WebSocketMessageType messageType = WebSocketMessageType.Binary, int partSize = Size)
         {
             Socket = webSocket;
             PartSize = partSize;

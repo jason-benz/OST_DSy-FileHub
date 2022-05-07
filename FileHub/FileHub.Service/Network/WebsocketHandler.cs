@@ -11,11 +11,11 @@ namespace FileHub.Service.Network
 {
     public class WebsocketHandler
     {
-        private const int  Kilo = 1024;
+        private const int  Size = 128 * 1024;
         private WebSocket Socket { get; set; }
         private int PartSize { get; set; }
         private WebSocketMessageType MessageType { get; set; }
-        public WebsocketHandler(WebSocket webSocket, WebSocketMessageType messageType = WebSocketMessageType.Binary, int partSize = Kilo)
+        public WebsocketHandler(WebSocket webSocket, WebSocketMessageType messageType = WebSocketMessageType.Binary, int partSize = Size)
         {
             this.Socket = webSocket;
             this.PartSize = partSize;
