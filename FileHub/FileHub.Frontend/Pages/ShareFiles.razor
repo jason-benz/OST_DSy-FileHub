@@ -9,8 +9,8 @@
 
 <h3>Share Files</h3>
 <b>Your share code: @_groupId</b>
-<p>You can upload up to @MaxAllowedFiles files with a size up to 500MB per file and share them with your friends</p>
-<InputFile OnChange="@LoadFiles" multiple />
+<p>You can upload files with a size up to 500MB and share them with your friends</p>
+<InputFile OnChange="@LoadFile" />
 
 @if (_isLoading)
 {
@@ -18,30 +18,32 @@
 }
 else
 {
-    <br /><br />
+    <br/><br/>
 
-    @foreach (var file in _loadedFiles)
+    @if (_loadedFile != null)
     {
-        <b>@file.Name</b>
+        <b>@_loadedFile.Name</b>
         <p>
-            Size (bytes): @file.Size
+            Size (bytes): @_loadedFile.Size
             <br />
-            Content type: @file.ContentType
+            Content type: @_loadedFile.ContentType
         </p>
-    }
-
-    @if (_loadedFiles.Any())
-    {
+    
         <button class="btn btn-primary" @onclick="UploadFiles">Start file upload</button>
         <br />
     }
 }
 
+<br/>
+<b>@_message</b>
+<br/>
+
 @code {
-    private readonly List<IBrowserFile> _loadedFiles = new();
-    private const int MaxAllowedFiles = 5;
+    private readonly string _groupId;
+    
     private bool _isLoading;
-    private string _groupId;
+    private IBrowserFile? _loadedFile;
+    private string _message = string.Empty;
     
     public ShareFiles()
     {
@@ -49,21 +51,17 @@ else
         _groupId = randomNumber + DateTime.Now.ToString("ssyyddmmhhMM"); 
     }
     
-    private void LoadFiles(InputFileChangeEventArgs e)
+    private void LoadFile(InputFileChangeEventArgs e)
     {
         _isLoading = true;
-        _loadedFiles.Clear();
 
-        foreach (var file in e.GetMultipleFiles(MaxAllowedFiles))
+        try
         {
-            try
-            {
-                _loadedFiles.Add(file);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"File: {file.Name} Error: {ex.Message}");
-            }
+            _loadedFile = e.File;
+        }
+        catch (Exception ex)
+        {
+        Console.WriteLine($"File: {e.File.Name} Error: {ex.Message}");
         }
 
         _isLoading = false;
@@ -71,21 +69,22 @@ else
 
     private async Task UploadFiles()
     {
+        _message = "Upload started. It may take a while. Please do not refresh the site.";
+        
         var baseUrl = _configuration.GetConnectionString("WsBaseUrl");
         
-        foreach (var file in _loadedFiles)
-        {
-            bool success;
-            WebsocketClient client;
-            IBinaryDataHandler data = new BinaryDataHandler(file);
+        bool success;
+        WebsocketClient client;
+        IBinaryDataHandler data = new BinaryDataHandler(_loadedFile);
             
-            do
-            {
-                client = new(new ClientWebSocket());
-                success = await client.Connect($"{baseUrl}/send/{_groupId}/{file.Name}") && await client.SendAsync(data);
-            } while (!success);
+        do
+        {
+            client = new WebsocketClient(new ClientWebSocket());
+            success = await client.Connect($"{baseUrl}/send/{_groupId}/{_loadedFile.Name}") && await client.SendAsync(data);
+        } while (!success);
 
-            client.Close();
-        }
+        client.Close();
+
+        _message = "All files were uploaded successfully. You can upload another one.";
     }
 }

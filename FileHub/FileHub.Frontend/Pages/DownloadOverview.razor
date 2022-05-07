@@ -37,6 +37,10 @@ else
                 </tr>
             }
         </table>
+        
+        <br/>
+        <b>@_message</b>
+        <br/>
     }
     else
     {
@@ -47,8 +51,9 @@ else
 @code {
     private bool _isLoading;
     private Dictionary<string, string> _fileInfos = new();
-    private string _httpBaseUrl;
-    private string _wsBaseUrl;
+    private string _httpBaseUrl = string.Empty;
+    private string _wsBaseUrl = string.Empty;
+    private string _message = string.Empty;
 
     [Parameter]
     public string GroupId { get; set; } = string.Empty;
@@ -78,6 +83,8 @@ else
 
     private async Task DownloadFile(string filename)
     {
+        _message = "Your download is being prepared. Please wait a moment.";
+        
         WebsocketClient client = new (new ClientWebSocket());
         IBinaryDataHandler data = new BinaryDataHandler();
         
@@ -86,5 +93,7 @@ else
 
         await _jsRuntime.InvokeVoidAsync("DownloadFile", filename, "application/octet-stream", bytes);
         client.Close();
+
+        _message = "Thanks for using FileHub.";
     }
 }
