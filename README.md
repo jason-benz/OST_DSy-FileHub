@@ -19,3 +19,15 @@ A fault tolerant, load balanced file sharing service.
     * If a user enters a valid authentication code he gets access to the file folder
     * He always can download the stored files
     * Depending on the folder settings he has the possibility to drop files to the folder
+
+# Architecture  
+## System  
+![system-arch.png](./system-arch.png)  
+
+## File-Service  
+![fileservice-arch.png](./fileservice-arch.png)  
+
+## Client
+![client-arch.png](./client-arch.png)
+
+## Load Balancing  
