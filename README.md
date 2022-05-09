@@ -38,6 +38,11 @@ Required components ([detailed requirements](https://dsl.i.ost.ch/lect/fs22/#cha
 # Architecture  
 ## System  
 ![system-arch.png](./sys-arch.png)  
+### Technology-Decisions:  
+As a frontend technology, we wanted to use a webclient for portability reasons. We chose to use Blazor Webassembly, because we were already familiar with this technology.  
+In between the frontend and the backend, we used Caddy as a loadbalancer and as a webserver to deliver our frontend. Caddy seemed like the right way to go, since it was easy to setup and provided automated switching to only running services, if one service would crash.  
+The backend is implemented in .NET for simplicitys sake, since our Blazor frontend is also implemented in .NET. Different libraries we're used to create the HTTP and WebSocket endpoints.  
+We use a standard filesystem as our storage-backend and mount it into all our service-instances via docker. Since we want users to be able to transfer and store big files this made much more sense than serializing the files into a database.  
 
 ## Backend  
 ![backend-arch.png](./backend-arch.png) 
