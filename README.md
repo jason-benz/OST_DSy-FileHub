@@ -63,3 +63,9 @@ The GUI Parts of the application are translated into HTML5, while Business logic
 and therefore indirectly on webassembly.
 
 ## Load Balancing  
+
+## Dockerization
+We chose Docker as our container solution, as this was covered in detail in the lecture and is a prerequisite. With the help of Docker, we create two images.\
+One contains the frontend and the load balancer. It listens on port 7070.\
+The other one contains the service (backend). This image is currently scaled to 2 containers. Internally, ports 8080-8081 are used, which are exposed to external port 8080. The data is mounted on a shared volume.
+![docker-containers.png](./docker-containers.png)
