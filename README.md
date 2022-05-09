@@ -1,10 +1,21 @@
 # FileHub
 A fault tolerant, load balanced file sharing service.
+
+# Contribution information
 * Contributors: Adrian Locher & Jason Benz
 * School: [OST - Eastern Switzerland University of Applied Sciences](https://www.ost.ch/)
 * Module: Distributed Systems (DSy)
 * Semester: Spring 2022
 * Advisor: Dr. Thomas Bocek
+
+# Overview
+The goal of the project is to create a first own distributed system. Since this is a school project, it is only a software draft with limited functionality. For a productive operation, further development and extensive testing would be necessary.\
+Required components ([detailed requirements](https://dsl.i.ost.ch/lect/fs22/#challenge-task-fs-2022)):
+* Simple Frontend
+* Self implemented websocket
+* Scalable and fault tolerance service
+* Load balancer
+* Dockerization
 
 # Use cases
 * File upload
