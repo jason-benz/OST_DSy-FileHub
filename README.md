@@ -37,7 +37,7 @@ Required components ([detailed requirements](https://dsl.i.ost.ch/lect/fs22/#cha
 
 # Architecture  
 ## System  
-![system-arch.png](./sys-arch.png)  
+![system-arch.png](./images/sys-arch.png)  
 ### Technology-Decisions:  
 As a frontend technology, we wanted to use a webclient for portability reasons. We chose to use Blazor Webassembly, because we were already familiar with this technology.  
 In between the frontend and the backend, we used Caddy as a loadbalancer and as a webserver to deliver our frontend. Caddy seemed like the right way to go, since it was easy to setup and provided automated switching to only running services, if one service would crash.  
@@ -45,7 +45,7 @@ The backend is implemented in .NET for simplicitys sake, since our Blazor fronte
 We use a standard filesystem as our storage-backend and mount it into all our service-instances via docker. Since we want users to be able to transfer and store big files this made much more sense than serializing the files into a database.  
 
 ## Backend  
-![backend-arch.png](./backend-arch.png) 
+![backend-arch.png](./images/backend-arch.png) 
 Our backend is basically a HTTP-Webserver with multiple endpoints.  
 - Health-Status: Responds always with HTTP-200, to notify the loadbalancer that the Service is running.  
 - File-Info: Responds information about all files of a group (a group of files is stored inside a single directory named after the group)  
@@ -56,8 +56,8 @@ The Directory-Info module gives information about file-names and -sizes of all f
 
 
 ## Client
-![client-arch.png](./client-arch.png)  
-![client-runtime.png](./client-runtime.png)  
+![client-arch.png](./images/client-arch.png)  
+![client-runtime.png](./images/client-runtime.png)  
 DotNet Blazor Webassembly is based on a DotNet Runtime implemented in Webassembly.
 The GUI Parts of the application are translated into HTML5, while Business logic implemented in C# runs on the runtime
 and therefore indirectly on webassembly.
@@ -67,5 +67,5 @@ and therefore indirectly on webassembly.
 ## Dockerization
 We chose Docker as our container solution, as this was covered in detail in the lecture and is a prerequisite. With the help of Docker, we create two images.\
 One contains the frontend and the load balancer. It listens on port 7070.\
-The other one contains the service (backend). This image is currently scaled to 2 containers. Internally, ports 8080-8081 are used, which are exposed to external port 8080. The data is mounted on a shared volume.
-![docker-containers.png](./docker-containers.png)
+The other one contains the service (backend). This image is currently scaled to 2 containers. Internally, ports 8080-8081 are used, which are exposed to external port 8080. The data is mounted on a shared volume.\
+![docker-containers.png](./images/docker-containers.png)
