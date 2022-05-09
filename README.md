@@ -22,7 +22,7 @@ A fault tolerant, load balanced file sharing service.
 
 # Architecture  
 ## System  
-![system-arch.png](./system-arch.png)  
+![system-arch.png](./sys-arch.png)  
 
 ## File-Service  
 ![fileservice-arch.png](./fileservice-arch.png)  
