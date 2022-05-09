@@ -29,5 +29,6 @@ A fault tolerant, load balanced file sharing service.
 
 ## Client
 ![client-arch.png](./client-arch.png)
+![client-runtime.png](./client-runtime.png)
 
 ## Load Balancing  
