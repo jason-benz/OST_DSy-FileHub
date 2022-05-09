@@ -63,8 +63,9 @@ The GUI Parts of the application are translated into HTML5, while Business logic
 and therefore indirectly on webassembly.
 
 ## Load Balancing  
+Caddy is an easy to configure, free and open source load balancer. We have chosen it because of its simplicity. The load balancer is delivered directly with the frontend and listens on port 7070. To allow the load balancer to handle the service requests, all requests are made over this port. Caddy randomly selects a service instance (port 8080). Every second the health URI (dataservice) is checked. Since the load balancer does not automatically forward the requests in the event of an error, the requests are repeated on the client side. The new request is then routed to a running instance by Caddy.
 
-## Dockerization
+## Container solution
 We chose Docker as our container solution, as this was covered in detail in the lecture and is a prerequisite. With the help of Docker, we create two images.\
 One contains the frontend and the load balancer. It listens on port 7070.\
 The other one contains the service (backend). This image is currently scaled to 2 containers. Internally, ports 8080-8081 are used, which are exposed to external port 8080. The data is mounted on a shared volume.\
