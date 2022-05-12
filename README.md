@@ -61,7 +61,8 @@ The Directory-Info module gives information about filenames and -sizes of all fi
 
 ## Client
 ![client-arch.png](./images/client-arch.png)  
-![client-runtime.png](./images/client-runtime.png)  
+![client-runtime.png](./images/client-runtime.png)\
+*Source: [docs.microsoft.com](https://docs.microsoft.com/de-de/dotnet/architecture/blazor-for-web-forms-developers/hosting-models)*\
 DotNet Blazor WebAssembly is based on a DotNet Runtime implemented in WebAssembly.
 The GUI parts of the application are translated into HTML5, while business logic implemented in C# runs on the runtime and therefore indirectly on WebAssembly.
 
