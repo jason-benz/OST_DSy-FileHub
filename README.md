@@ -35,8 +35,9 @@ Required components ([detailed requirements](https://dsl.i.ost.ch/lect/fs22/#cha
 * Persistent storage: File system
 * Container solution: Docker
 
-# Project Setup
-![project-setup.png](./images/project-setup.png)
+# Project Setup  
+![project-setup.png](./images/project-setup.png)  
+- Please note that this diagram does not display every single file and folder of our project, but all the files and folders necessary how the FileHub system works.
 
 # Architecture  
 ## System  
