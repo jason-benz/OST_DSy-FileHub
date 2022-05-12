@@ -35,6 +35,9 @@ Required components ([detailed requirements](https://dsl.i.ost.ch/lect/fs22/#cha
 * Persistent storage: File system
 * Container solution: Docker
 
+# Project Setup
+![project-setup.png](./images/project-setup.png)
+
 # Architecture  
 ## System  
 ![system-arch.png](./images/sys-arch.png)  
