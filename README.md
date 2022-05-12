@@ -45,7 +45,7 @@ Required components ([detailed requirements](https://dsl.i.ost.ch/lect/fs22/#cha
 ### Technology-Decisions:
 As a frontend technology, we wanted to use a webclient for portability reasons. We chose to use Blazor WebAssembly, because we were already familiar with this technology.  
 In between the frontend and the backend, we used Caddy as a loadbalancer and as a webserver to deliver our frontend. Caddy seemed like the right way to go, since it was easy to setup and provided automated switching to only running services, if one service would crash.  
-The backend is implemented in .NET for simplicitys sake, since our Blazor frontend is also implemented in .NET. Different libraries were used to create the HTTP and WebSocket endpoints.  
+The backend is implemented in .NET for simplicitys sake, since our Blazor frontend is also implemented in .NET. Different libraries were used to create the HTTP and websocket endpoints.  
 We use a standard filesystem as our storage-backend and mount it into all our service-instances via Docker. Since we want users to be able to transfer and store big files this made much more sense than serializing the files into a database.  
 
 ## Backend  
@@ -63,7 +63,7 @@ The Directory-Info module gives information about filenames and -sizes of all fi
 ![client-arch.png](./images/client-arch.png)  
 ![client-runtime.png](./images/client-runtime.png)  
 DotNet Blazor WebAssembly is based on a DotNet Runtime implemented in WebAssembly.
-The GUI parts of the application are translated into HTML5, while business logic implemented in C# runs on the runtime and therefore indirectly on webassembly.
+The GUI parts of the application are translated into HTML5, while business logic implemented in C# runs on the runtime and therefore indirectly on WebAssembly.
 
 ## Load Balancing  
 Caddy is an easy to configure, free and open source load balancer. We have chosen it because of its simplicity. The load balancer is delivered directly with the frontend and listens on port 7070. To allow the load balancer to handle the service requests, all requests are made over this port. Caddy randomly selects a service instance (port 8080). Every second the health URI (dataservice) is checked. Since the load balancer does not automatically forward the requests in the event of an error, the requests are repeated on the client side. The new request is then routed to a running instance by Caddy.
