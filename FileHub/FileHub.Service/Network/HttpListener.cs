@@ -5,7 +5,6 @@ using FileHub.Service.Datahandling;
 
 namespace FileHub.Service.Network
 {
-    //example used: https://github.com/paulbatum/WebSocket-Samples/blob/master/HttpListenerWebSocketEcho/Server/Server.cs
     class WebsocketServer
     {
         private int connectionsAmount;
@@ -79,7 +78,7 @@ namespace FileHub.Service.Network
             string[] path = httpRequest.Url.AbsolutePath.Split('/');
             if (path.Length < 5)
             {
-                throw new Exception("Invalid request path"); //todo replace with more semantic exception
+                throw new Exception("Invalid request path");
             }
 
             string operation = path[2];
@@ -90,10 +89,10 @@ namespace FileHub.Service.Network
             
             switch (operation)
             {
-                case "send": //todo replace constant
+                case "send":
                     await (handler.Read(fileHandler));
                     break;
-                case "receive": //todo replace constant
+                case "receive":
                     await (handler.Write(fileHandler));
                     break;
                 default:
@@ -106,7 +105,7 @@ namespace FileHub.Service.Network
         private void HandleNonWebsocketConnection(HttpListenerContext listenerContext)
         {
             string[] path = listenerContext.Request.Url.AbsolutePath.Split('/');
-            if (path.Length == 2) //health-check-response
+            if (path.Length == 2) // health-check-response
             {
                 RespondStatus(listenerContext, 200);
             }

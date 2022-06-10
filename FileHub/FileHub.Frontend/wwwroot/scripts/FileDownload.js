@@ -1,5 +1,4 @@
-﻿// Source: https://www.meziantou.net/generating-and-downloading-a-file-in-a-blazor-webassembly-application.htm
-function DownloadFile(filename, contentType, content) {
+﻿function DownloadFile(filename, contentType, content) {
     const file = new File([content], filename, { type: contentType });
     const exportUrl = URL.createObjectURL(file);
 

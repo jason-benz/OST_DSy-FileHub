@@ -2,7 +2,7 @@ namespace FileHub.Service.Datahandling
 {
     public class BinaryArchitect : IBinaryDataHandler
     {
-        public static string DataFolderName { get; set; } = "data"; //todo clean
+        public static string DataFolderName { get; set; } = "data";
         
         private readonly string _filePath;
         private FileStream _fileStream;
@@ -53,7 +53,7 @@ namespace FileHub.Service.Datahandling
         {
             byte[] data = new byte[partSizeInBytes];
             int length = _fileStream.Read(data, 0, partSizeInBytes);
-            return new DataPart {Data = data, DataLength = length, LastPart = length < partSizeInBytes}; //todo check if LastPart is asserted correctly
+            return new DataPart {Data = data, DataLength = length, LastPart = length < partSizeInBytes};
         }
 
         public void Close()

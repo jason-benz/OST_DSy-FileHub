@@ -78,7 +78,7 @@ namespace FileHub.Service.Network
         {
             if (Socket.State == WebSocketState.Closed)
             {
-                throw new Exception("socket was closed while trying to send"); //todo semantic exc
+                throw new Exception("socket was closed while trying to send");
             }
 
             Socket.SendAsync(new ArraySegment<byte>(data, 0, length), MessageType, true, CancellationToken.None).Wait();
