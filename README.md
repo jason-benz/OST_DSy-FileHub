@@ -74,3 +74,4 @@ We chose Docker as our container solution, as this was covered in detail in the 
 One contains the frontend and the load balancer. It listens on port 7070.\
 The other one contains the service (backend). This image is currently scaled to 2 containers. Internally, ports 8080-8081 are used, which are exposed to external port 8080. The data is mounted on a shared volume.\
 ![docker-containers.png](./images/docker-containers.png)
+ 
